@@ -5,6 +5,7 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{fancyhdr}
 
 \lstset{
   basicstyle=\ttfamily\small,
@@ -18,8 +19,14 @@
 \graphicspath{{images/}}
 
 \title{Blue-Green Deployment of a Node.js Application}
-\author{Prepared by Codex Assistant}
+\author{Yuvan Raj Krishna (Reg No. 22011102127)}
 \date{\today}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Yuvan Raj Krishna --- Reg No. 22011102127}
+\setlength{\headheight}{14pt}
+\cfoot{\thepage}
 
 \begin{document}
 \maketitle
@@ -195,13 +202,6 @@ The lab delivers a reusable workflow:
   \item Deterministic Node.js container image published to Docker Hub.
   \item Docker Compose stack that keeps blue and green environments warm while an NGINX proxy steers production traffic.
   \item Jenkins pipeline that automates build, push, deploy, smoke test, and promotion with a single click.
-\end{itemize}
-
-\section{Next Steps}
-\begin{itemize}
-  \item Add automated API tests (e.g., supertest) and fail the pipeline if assertions break.
-  \item Implement automated rollback logic when smoke tests fail, leveraging the untouched color as a hot standby.
-  \item Parameterize additional observability hooks (Prometheus, Slack notifications) to capture promotion events.
 \end{itemize}
 
 \end{document}
