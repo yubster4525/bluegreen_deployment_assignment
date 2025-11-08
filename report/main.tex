@@ -16,6 +16,15 @@
   commentstyle=\color{green!50!black}
 }
 
+\lstdefinelanguage{YAML}{
+  keywords={true,false,null},
+  keywordstyle=\color{blue!60!black},
+  basicstyle=\ttfamily\small,
+  comment=[l]{\#},
+  morestring=[b]",
+  morestring=[b]'
+}
+
 \graphicspath{{images/}}
 
 \title{Blue-Green Deployment of a Node.js Application}
@@ -203,5 +212,24 @@ The lab delivers a reusable workflow:
   \item Docker Compose stack that keeps blue and green environments warm while an NGINX proxy steers production traffic.
   \item Jenkins pipeline that automates build, push, deploy, smoke test, and promotion with a single click.
 \end{itemize}
+
+\appendix
+\section*{Appendix: Key Configuration Files}
+\addcontentsline{toc}{section}{Appendix: Key Configuration Files}
+
+\subsection*{Jenkinsfile}
+\lstinputlisting[language=Java]{../Jenkinsfile}
+
+\subsection*{Dockerfile}
+\lstinputlisting[language=bash]{../Dockerfile}
+
+\subsection*{Docker Compose Definition}
+\lstinputlisting[language=YAML]{../docker-compose.bluegreen.yml}
+
+\subsection*{Deployment Script}
+\lstinputlisting[language=bash]{../scripts/deploy-color.sh}
+
+\subsection*{Traffic Switch Script}
+\lstinputlisting[language=bash]{../scripts/switch-color.sh}
 
 \end{document}

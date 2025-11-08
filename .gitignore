@@ -1,6 +1,7 @@
 node_modules
 .env
 report/*.pdf
+!report/22011102127_yuvan_bluegreen.pdf
 *.log
 server.pid
 .DS_Store
