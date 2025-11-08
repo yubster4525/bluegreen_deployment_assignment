@@ -1,0 +1,8 @@
+LAB EXERCISE – 12
+
+Blue-green Deployment
+
+TASK:
+Implement a Blue-Green Deployment strategy for a Node.js application. 
+The goal is to containerize the app using Docker, push it to Docker Hub, and set up a Jenkins pipeline that deploys the app in two separate environments, blue and green. The deployment should ensure zero-downtime, allowing users to continue using the application while a new version is deployed and tested.
+PROCEDURE: YOU WILL SUBMIT THE PROCEDURE 

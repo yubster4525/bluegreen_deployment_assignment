@@ -1,0 +1,126 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!10},
+  keywordstyle=\color{blue!60!black},
+  commentstyle=\color{green!50!black}
+}
+
+\graphicspath{{images/}}
+
+\title{Blue-Green Deployment of a Node.js Application}
+\author{Prepared by Codex Assistant}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Objective}
+Implement a zero-downtime blue-green deployment workflow for a Node.js service by containerizing the app, publishing images to Docker Hub, and automating deployment via a Jenkins pipeline that alternates between blue and green environments.
+
+\section{System Overview}
+\begin{itemize}
+  \item \textbf{Application}: Express server exposing `/` and `/health`.
+  \item \textbf{Containerization}: Dockerfile based on `node:20-alpine` plus `.dockerignore`.
+  \item \textbf{Orchestration}: `docker-compose.bluegreen.yml` launches two app containers and an NGINX proxy that reads the active color from `.env`.
+  \item \textbf{CI/CD}: Jenkins pipeline builds, tests, publishes, deploys to the idle color, smoke-tests, and optionally flips traffic.
+\end{itemize}
+
+\section{Implementation Steps}
+\subsection{Build the Node.js service}
+\begin{lstlisting}[language=bash]
+npm init -y
+npm install express
+cat > src/server.js <<'JS'
+  // Express app uses APP_COLOR/APP_VERSION to render status
+JS
+npm start
+\end{lstlisting}
+
+\subsection{Containerize the service}
+\begin{lstlisting}[language=bash]
+docker build -t bluegreen-demo:dev .
+docker run -p 3000:3000 bluegreen-demo:dev
+\end{lstlisting}
+
+\subsection{Compose blue/green stacks}
+\begin{lstlisting}[language=bash]
+cp .env.sample .env  # fill Docker Hub values
+ACTIVE_COLOR=blue docker compose -f docker-compose.bluegreen.yml up -d --build
+open http://localhost:8080
+\end{lstlisting}
+
+\subsection{Automate release helpers}
+\begin{itemize}
+  \item \texttt{scripts/build-and-push.sh <tag>} builds/pushes \texttt{DOCKERHUB\_USERNAME/APP\_NAME:<tag>}.
+  \item \texttt{scripts/deploy-color.sh <blue|green> <image> <version>} updates \texttt{.env} entries and restarts the chosen color.
+  \item \texttt{scripts/switch-color.sh <blue|green>} rewrites \texttt{ACTIVE\_COLOR} and recreates the proxy.
+\end{itemize}
+
+\section{Jenkins Pipeline}
+The declarative pipeline (Listing~\ref{lst:jenkins}) contains parameters for repository, tag, smoke-test URL, deploy color, and whether to switch traffic. Pipeline stages:
+\begin{enumerate}
+  \item Checkout code and install dependencies with `npm ci`.
+  \item Run placeholder unit tests (ready for future expansion).
+  \item Build Docker image tagged with either the provided \texttt{IMAGE\_TAG} or \texttt{build-\$BUILD\_NUMBER}.
+  \item Push to Docker Hub using the \texttt{dockerhub-creds} credential.
+  \item Deploy the idle color via `scripts/deploy-color.sh`.
+  \item Smoke-test the `/health` endpoint.
+  \item Optionally switch the proxy to route users to the freshly deployed color.
+\end{enumerate}
+
+\begin{lstlisting}[language=Java, caption={Jenkinsfile excerpt}, label={lst:jenkins}]
+stage('Deploy to idle color') {
+  steps {
+    sh "./scripts/deploy-color.sh ${params.DEPLOY_COLOR} $IMAGE_NAME $RELEASE_TAG"
+  }
+}
+\end{lstlisting}
+
+\section{Testing and Verification}
+\subsection{Docker build}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{docker-build.png}
+  \caption{Placeholder --- replace with actual Docker build/push screenshot.}
+\end{figure}
+
+\subsection{Blue vs Green containers}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{compose-green.png}
+  \caption{Placeholder --- capture `docker compose ps` showing both environments.}
+\end{figure}
+
+\subsection{Jenkins success}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{jenkins-pipeline.png}
+  \caption{Placeholder --- screenshot of Jenkins stage view/pipeline success.}
+\end{figure}
+
+\section{Results}
+The lab delivers a reusable workflow:
+\begin{itemize}
+  \item Deterministic Node.js container image published to Docker Hub.
+  \item Docker Compose stack that keeps blue and green environments warm while an NGINX proxy steers production traffic.
+  \item Jenkins pipeline that automates build, push, deploy, smoke test, and promotion with a single click.
+\end{itemize}
+
+\section{Next Steps}
+\begin{itemize}
+  \item Replace placeholder screenshots with real captures before submission.
+  \item Add automated tests (e.g., supertest) and integrate into the `npm test` stage.
+  \item Extend pipeline with automated rollback logic if smoke tests fail.
+\end{itemize}
+
+\end{document}
