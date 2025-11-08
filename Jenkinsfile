@@ -9,13 +9,14 @@ pipeline {
 
   environment {
     REGISTRY_CREDENTIALS = 'dockerhub-creds'
+    PATH = "/opt/homebrew/bin:/usr/local/bin:${env.PATH}"
   }
 
   parameters {
     choice(name: 'DEPLOY_COLOR', choices: ['blue', 'green'], description: 'Idle environment that should receive the new version first')
     string(name: 'DOCKERHUB_REPO', defaultValue: 'dockerhub-username/bluegreen-demo', description: 'Docker Hub repository (e.g. user/app)')
     string(name: 'IMAGE_TAG', defaultValue: '', description: 'Optional image tag override. Leave blank to use build number')
-    string(name: 'SMOKE_TEST_URL', defaultValue: 'http://bluegreen-proxy.example.com/health', description: 'URL hit after deployment to verify the new color')
+    string(name: 'SMOKE_TEST_URL', defaultValue: 'http://localhost:8090/health', description: 'URL hit after deployment to verify the new color')
     booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch NGINX proxy to the new color after smoke tests pass?')
   }
 
