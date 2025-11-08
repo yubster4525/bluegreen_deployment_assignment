@@ -61,6 +61,26 @@ pipeline {
       }
     }
 
+    stage('Prepare env file') {
+      steps {
+        script {
+          def repoParts = params.DOCKERHUB_REPO.tokenize('/')
+          def dockerUser = repoParts ? repoParts[0] : 'dockerhub-user'
+          def appName = repoParts.size() > 1 ? repoParts[1] : 'bluegreen-demo'
+          def envText = """
+            ACTIVE_COLOR=blue
+            DOCKERHUB_USERNAME=${dockerUser}
+            APP_NAME=${appName}
+            BLUE_IMAGE=${params.DOCKERHUB_REPO}:blue
+            GREEN_IMAGE=${params.DOCKERHUB_REPO}:green
+            BLUE_VERSION=1.0.0
+            GREEN_VERSION=1.0.1
+          """.stripIndent().trim() + "\n"
+          writeFile file: '.env', text: envText
+        }
+      }
+    }
+
     stage('Deploy to idle color') {
       steps {
         sh "./scripts/deploy-color.sh ${params.DEPLOY_COLOR} $IMAGE_NAME $RELEASE_TAG"
