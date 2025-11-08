@@ -3,7 +3,7 @@ services:
   blue:
     build: .
     image: ${BLUE_IMAGE}
-    container_name: blue-app
+    container_name: "${STACK_PREFIX:-}blue-app"
     environment:
       - APP_COLOR=blue
       - APP_ENV=blue
@@ -13,7 +13,7 @@ services:
   green:
     build: .
     image: ${GREEN_IMAGE}
-    container_name: green-app
+    container_name: "${STACK_PREFIX:-}green-app"
     environment:
       - APP_COLOR=green
       - APP_ENV=green
@@ -22,7 +22,7 @@ services:
       - "3002:3000"
   proxy:
     image: nginx:1.27-alpine
-    container_name: bluegreen-proxy
+    container_name: "${STACK_PREFIX:-}bluegreen-proxy"
     depends_on:
       - blue
       - green

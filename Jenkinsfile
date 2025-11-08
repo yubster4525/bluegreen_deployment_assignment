@@ -75,6 +75,7 @@ pipeline {
             GREEN_IMAGE=${params.DOCKERHUB_REPO}:green
             BLUE_VERSION=1.0.0
             GREEN_VERSION=1.0.1
+            STACK_PREFIX=jenkins-
           """.stripIndent().trim() + "\n"
           writeFile file: '.env', text: envText
         }
