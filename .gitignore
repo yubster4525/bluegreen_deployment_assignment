@@ -3,3 +3,5 @@ node_modules
 report/*.pdf
 *.log
 server.pid
+.DS_Store
+report/.DS_Store

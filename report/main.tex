@@ -1,8 +1,8 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
-\usepackage{hyperref}
 \usepackage{float}
+\usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{listings}
 
@@ -87,25 +87,106 @@ stage('Deploy to idle color') {
 \end{lstlisting}
 
 \section{Testing and Verification}
-\subsection{Docker build}
+\subsection{Local preparation}
+Figure~\ref{fig:env-file} captures the completed `.env` file populated with the Docker Hub coordinates, and Figure~\ref{fig:npm-install} shows `npm install` succeeding prior to containerization.
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth]{docker-build.png}
-  \caption{Placeholder --- replace with actual Docker build/push screenshot.}
+  \includegraphics[width=0.65\linewidth]{env-file.png}
+  \caption{Environment file populated with blue/green image references.}
+  \label{fig:env-file}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\linewidth]{npm-install.png}
+  \caption{Dependencies installed locally before containerizing.}
+  \label{fig:npm-install}
 \end{figure}
 
-\subsection{Blue vs Green containers}
+\subsection{Application preview}
+Figures~\ref{fig:curl-home} and \ref{fig:ui-blue} document the HTML served by the Node.js process and the styled UI indicating the blue stack metadata.
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth]{compose-green.png}
-  \caption{Placeholder --- capture `docker compose ps` showing both environments.}
+  \includegraphics[width=0.85\linewidth]{curl-home-html.png}
+  \caption{`curl http://localhost:3000` returning the rendered HTML/CSS.}
+  \label{fig:curl-home}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\linewidth]{ui-blue.png}
+  \caption{Browser view of the blue stack showing version and host info.}
+  \label{fig:ui-blue}
 \end{figure}
 
-\subsection{Jenkins success}
+\subsection{Container build and registry proof}
+Figure~\ref{fig:build-push} shows the helper script building and pushing `yuvan4525/bluegreen-demo:blue`, while Figure~\ref{fig:dockerhub} confirms the tag in Docker Hub.
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth]{jenkins-pipeline.png}
-  \caption{Placeholder --- screenshot of Jenkins stage view/pipeline success.}
+  \includegraphics[width=0.9\linewidth]{build-push-script.png}
+  \caption{`./scripts/build-and-push.sh blue` output including digest.}
+  \label{fig:build-push}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\linewidth]{dockerhub-tag.png}
+  \caption{Docker Hub repository showing the freshly pushed tag.}
+  \label{fig:dockerhub}
+\end{figure}
+
+\subsection{Blue/green stack validation}
+Figure~\ref{fig:compose-ps} captures `docker compose ps` with both app containers plus the proxy, while Figure~\ref{fig:proxy-health} shows the proxy `/health` endpoint reporting the blue environment.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{compose-ps.png}
+  \caption{Compose stack running blue, green, and proxy services locally.}
+  \label{fig:compose-ps}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\linewidth]{proxy-health.png}
+  \caption{Proxy health endpoint exposing blue metadata before the switch.}
+  \label{fig:proxy-health}
+\end{figure}
+
+\subsection{Green deployment and traffic switch}
+Figures~\ref{fig:deploy-green}, \ref{fig:green-health}, and \ref{fig:proxy-green} document the CLI deployment to the idle color, the `/health` check on port 3002, and the subsequent switch that routes users to the green UI.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{deploy-green-cli.png}
+  \caption{`deploy-color.sh` rolling out the green environment.}
+  \label{fig:deploy-green}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\linewidth]{green-health.png}
+  \caption{Green stack `/health` response confirming version 1.0.1.}
+  \label{fig:green-health}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\linewidth]{proxy-green-ui.png}
+  \caption{Proxy-backed UI after switching traffic to the green environment.}
+  \label{fig:proxy-green}
+\end{figure}
+
+\subsection{Jenkins pipeline evidence}
+Figures~\ref{fig:jenkins-stages}--\ref{fig:jenkins-console} summarize the Jenkins success: the stage view, permalinks widget, and console log snippet covering docker login/push.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{jenkins-stages.png}
+  \caption{Blue Ocean stage visualization showing every stage green.}
+  \label{fig:jenkins-stages}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.45\linewidth]{jenkins-permalinks.png}
+  \caption{Job permalinks confirming build \#11 as the latest stable run.}
+  \label{fig:jenkins-permalinks}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{jenkins-console.png}
+  \caption{Console log excerpt covering the docker push executed by Jenkins.}
+  \label{fig:jenkins-console}
 \end{figure}
 
 \section{Results}
@@ -118,9 +199,9 @@ The lab delivers a reusable workflow:
 
 \section{Next Steps}
 \begin{itemize}
-  \item Replace placeholder screenshots with real captures before submission.
-  \item Add automated tests (e.g., supertest) and integrate into the `npm test` stage.
-  \item Extend pipeline with automated rollback logic if smoke tests fail.
+  \item Add automated API tests (e.g., supertest) and fail the pipeline if assertions break.
+  \item Implement automated rollback logic when smoke tests fail, leveraging the untouched color as a hot standby.
+  \item Parameterize additional observability hooks (Prometheus, Slack notifications) to capture promotion events.
 \end{itemize}
 
 \end{document}

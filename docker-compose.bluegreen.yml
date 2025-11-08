@@ -28,7 +28,7 @@ services:
     environment:
       - ACTIVE_COLOR=${ACTIVE_COLOR}
     ports:
-      - "${PROXY_PORT:-8090}:80"
+      - "${PROXY_PORT:-8080}:80"
     volumes:
       - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     command: /bin/sh -c "envsubst '$$ACTIVE_COLOR' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
