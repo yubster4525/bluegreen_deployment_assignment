@@ -8,7 +8,7 @@ pipeline {
   }
 
   environment {
-    REGISTRY_CREDENTIALS = 'dockerhub-creds'
+    REGISTRY_CREDENTIALS = 'c15b784c-6898-4020-8619-6d9aac49c3bc'
     PATH = "/opt/homebrew/bin:/usr/local/bin:${env.PATH}"
   }
 
