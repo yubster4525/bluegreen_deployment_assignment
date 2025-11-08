@@ -16,7 +16,7 @@ pipeline {
     choice(name: 'DEPLOY_COLOR', choices: ['blue', 'green'], description: 'Idle environment that should receive the new version first')
     string(name: 'DOCKERHUB_REPO', defaultValue: 'yuvan4525/bluegreen-demo', description: 'Docker Hub repository (e.g. user/app)')
     string(name: 'IMAGE_TAG', defaultValue: '', description: 'Optional image tag override. Leave blank to use build number')
-    string(name: 'SMOKE_TEST_URL', defaultValue: 'http://localhost:8090/health', description: 'URL hit after deployment to verify the new color')
+    string(name: 'SMOKE_TEST_URL', defaultValue: 'http://localhost:8180/health', description: 'URL hit after deployment to verify the new color')
     booleanParam(name: 'SWITCH_TRAFFIC', defaultValue: false, description: 'Switch NGINX proxy to the new color after smoke tests pass?')
   }
 
@@ -76,6 +76,9 @@ pipeline {
             BLUE_VERSION=1.0.0
             GREEN_VERSION=1.0.1
             STACK_PREFIX=jenkins-
+            BLUE_PORT=3101
+            GREEN_PORT=3102
+            PROXY_PORT=8180
           """.stripIndent().trim() + "\n"
           writeFile file: '.env', text: envText
         }
